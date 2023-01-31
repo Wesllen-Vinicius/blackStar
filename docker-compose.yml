@@ -1,3 +1,6 @@
+## comandos de development
+## docker-compose run main
+
 version: '3.7'
 
 services:
@@ -7,12 +10,11 @@ services:
       context: .
       target: development
     volumes:
-      - .:/app
-      - /app/node_modules/bcrypt/
+      - .:/usr/src/app
     ports:
       - ${SERVER_PORT}:3000
       - 9229:9229
-    command: yarn start:dev
+    command: sh -c "yarn migrate && yarn start:dev"
     env_file:
       - .env
     networks:
@@ -34,7 +36,6 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
       - pgdata:/var/lib/postgresql/data
-
 networks:
   webnet:
 volumes:

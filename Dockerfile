@@ -1,8 +1,10 @@
-FROM node:latest As development
+FROM node:18.10.0 As development
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+
+COPY yarn.lock ./
 
 RUN yarn
 
@@ -15,21 +17,15 @@ RUN yarn build
 
 
 
-FROM node:latest as production
+FROM node:18.10.0 as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-
-RUN yarn
-
-COPY . .
-
-RUN npx prisma generate
-
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/main"]
+RUN npx prisma migrate deploy
+
+CMD ["yarn", "start:prod"]
